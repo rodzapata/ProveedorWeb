@@ -1,0 +1,28 @@
+--instalamos nest en el pc
+npm install -g @nestjs/cli
+
+--creamos el proyecto llamado nest-api
+nest new nest-api
+
+--para que genere el ejcutable por primera vez
+npm start
+--ejecutamo
+npm run dev
+
+--forma corrrecta
+npm start:dev
+
+--compilar en production
+npm run build
+
+--instalamo doker para usar la imagen de postgresql
+
+--instalamos dependencias de sqlserver y el orm
+npm install @nestjs/typeorm typeorm mssql
+
+npm install @nestjs/typeorm typeorm mssql
+
+npm install typeorm typeorm mssql
+
+
+

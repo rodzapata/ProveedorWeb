@@ -1,0 +1,19 @@
+segun las buenas practicas usar en nest las entities con __dirname, como el siguiente codigo, o escribimos directamente el nombre de la entidad Dpto, Municipio
+
+el codigo corregido fue 
+
+@Module({
+  imports: [TypeOrmModule.forRoot({
+      type: 'mssql',
+      host: 'localhost',
+      port: 61061,
+      username: 'sa',
+      password: 'Clave01.',
+      database: 'proveedorWeb',
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      synchronize: false,
+      options: { encrypt: false }
+    }),
+
+    DptoModule, MunicipioModule
+  ],

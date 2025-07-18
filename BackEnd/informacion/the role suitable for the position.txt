@@ -1,0 +1,10 @@
+the role suitable for the position is data analyst
+cover every single features
+keep your functions short and focused on a single task.
+he made an attempt to fix the bug, but is dind'nt work.
+I cant even help you implement unit and integration tests.
+the sub functions can perform a search and replace action.
+
+
+
+

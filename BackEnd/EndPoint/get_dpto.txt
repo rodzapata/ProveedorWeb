@@ -1,0 +1,5 @@
+http://localhost:3000/api/dpto
+http://localhost:3000/api/municipio
+
+http://localhost:3000/api/dpto/1
+

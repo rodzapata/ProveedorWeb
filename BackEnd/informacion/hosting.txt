@@ -1,0 +1,6 @@
+🧠 Alternativas si necesitas un backend completo
+Plataforma	Soporta backend completo	Gratuito	Notas
+🟢 Render	Sí (Java, .NET, Node, etc.)	Sí (limitado)	Ideal para backends fullstack
+🟢 Railway	Sí	Sí (hasta cierto límite)	Fácil de usar, backend y frontend
+🟢 Fly.io	Sí	Sí (máquinas pequeñas)	Ideal para apps pequeñas
+🔵 Vercel	Solo Serverless	Sí	Ideal para frontend + funciones API

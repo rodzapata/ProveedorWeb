@@ -1,0 +1,31 @@
+using Npgsql;
+using System.IO;
+
+class Program
+{
+    static void Main()
+    {
+        var connString = "Host=localhost;Username=usuario;Password=clave;Database=tu_basedatos";
+
+        using var conn = new NpgsqlConnection(connString);
+        conn.Open();
+
+        using var reader = new StreamReader("C:/ruta/archivo.csv");
+        using var importer = conn.BeginBinaryImport("COPY mi_tabla (col1, col2, col3) FROM STDIN (FORMAT BINARY)");
+
+        string? line;
+        reader.ReadLine(); // Saltar encabezado
+
+        while ((line = reader.ReadLine()) != null)
+        {
+            var fields = line.Split(',');
+            importer.StartRow();
+            importer.Write(fields[0]);
+            importer.Write(fields[1]);
+            importer.Write(fields[2]);
+        }
+
+        importer.Complete();
+        Console.WriteLine("Carga masiva completada");
+    }
+}

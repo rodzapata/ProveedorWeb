@@ -1,0 +1,345 @@
+3. CONFIGURAR JWT AUTH
+3.1. 📁 Estructura recomendada:
+
+src/
+├── auth/
+│   ├── auth.module.ts
+│   ├── auth.service.ts
+│   ├── auth.controller.ts
+│   ├── jwt.strategy.ts
+│   ├── dto/
+│   │   └── login.dto.ts
+├── users/
+│   ├── user.entity.ts
+│   ├── users.service.ts
+│   └── users.module.ts
+
+nest g resource auth
+nest g resource user
+
+3.2. 📄 user.entity.ts (ejemplo simple)
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+
+@Entity('users')
+export class User {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  username: string;
+
+  @Column()
+  password: string; // Encriptado con bcrypt
+}
+
+3.2.1 Pipe Adicional Necesito que recorte los espacios en blanco en los campos
+nest g pipe common/pipes/trim.pipe.ts
+
+📁 src/common/pipes/trim.pipe.ts
+import {
+  ArgumentMetadata,
+  Injectable,
+  PipeTransform,
+} from '@nestjs/common';
+
+@Injectable()
+export class TrimPipe implements PipeTransform {
+  transform(value: any, metadata: ArgumentMetadata) {
+    if (typeof value !== 'object' || value === null) return value;
+
+    const trimmed = {};
+    for (const key in value) {
+      const val = value[key];
+      trimmed[key] = typeof val === 'string' ? val.trim() : val;
+    }
+
+    return trimmed;
+  }
+}
+
+📦 Cómo usarlo en un controlador
+import { Body, Controller, Post } from '@nestjs/common';
+import { CreateUserDto } from './dto/create-user.dto';
+import { TrimPipe } from '../../common/pipes/trim.pipe'; // ruta relativa
+
+@Controller('users')
+export class UsersController {
+  @Post()
+  create(@Body(new TrimPipe()) body: CreateUserDto) {
+    // body ya tiene los strings recortados
+    return body;
+  }
+}
+
+🧠 Tip extra
+Si quieres aplicar el pipe globalmente a todos los endpoints, también puedes hacerlo en main.ts:
+import { TrimPipe } from './common/pipes/trim.pipe';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  app.useGlobalPipes(new TrimPipe());
+  await app.listen(3000);
+}
+
+
+
+3.3. 📄 auth.service.ts
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { UsersService } from '../users/users.service';
+import * as bcrypt from 'bcrypt';
+
+@Injectable()
+export class AuthService {
+  constructor(
+    private usersService: UsersService,
+    private jwtService: JwtService,
+  ) {}
+
+  async validateUser(username: string, pass: string): Promise<any> {
+    const user = await this.usersService.findByUsername(username);
+    if (user && await bcrypt.compare(pass, user.password)) {
+      const { password, ...result } = user;
+      return result;
+    }
+    return null;
+  }
+
+  async login(user: any) {
+    const payload = { username: user.username, sub: user.id };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
+  }
+}
+
+3.4. 📄 jwt.strategy.ts
+import { Injectable } from '@nestjs/common';
+import { PassportStrategy } from '@nestjs/passport';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+
+@Injectable()
+export class JwtStrategy extends PassportStrategy(Strategy) {
+  constructor() {
+    super({
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      ignoreExpiration: false,
+      secretOrKey: 'jwt_secret_key', // debes mover esto a .env
+    });
+  }
+
+  async validate(payload: any) {
+    return { userId: payload.sub, username: payload.username };
+  }
+}
+
+3.5. 📄 auth.module.ts
+import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { AuthService } from './auth.service';
+import { UsersModule } from '../users/users.module';
+import { JwtStrategy } from './jwt.strategy';
+import { AuthController } from './auth.controller';
+
+@Module({
+  imports: [
+    UsersModule,
+    PassportModule,
+    JwtModule.register({
+      secret: 'jwt_secret_key', // usa dotenv
+      signOptions: { expiresIn: '1h' },
+    }),
+  ],
+  providers: [AuthService, JwtStrategy],
+  controllers: [AuthController],
+})
+export class AuthModule {}
+
+3.6. 📄 auth.controller.ts
+import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
+import { AuthService } from './auth.service';
+import { LoginDto } from './dto/login.dto';
+
+@Controller('auth')
+export class AuthController {
+  constructor(private authService: AuthService) {}
+
+  @Post('login')
+  async login(@Body() loginDto: LoginDto) {
+    const user = await this.authService.validateUser(loginDto.username, loginDto.password);
+    if (!user) {
+      throw new UnauthorizedException('Credenciales inválidas');
+    }
+    return this.authService.login(user);
+  }
+}
+
+3.7. 📄 login.dto.ts
+import { IsString } from 'class-validator';
+
+export class LoginDto {
+  @IsString()
+  username: string;
+
+  @IsString()
+  password: string;
+}
+
+3.8. 📄 users.service.ts
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './user.entity';
+
+@Injectable()
+export class UsersService {
+  constructor(
+    @InjectRepository(User)
+    private userRepo: Repository<User>,
+  ) {}
+
+  async findByUsername(username: string) {
+    return this.userRepo.findOne({ where: { username } });
+  }
+}
+
+3.9. 🔒 Proteger Rutas con JWT
+Ejemplo en dpto.controller.ts:
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+
+@UseGuards(JwtAuthGuard)
+@Get()
+findAll() {
+  return this.dptoService.findAll();
+}
+
+Crea el guard:
+📄 auth/jwt-auth.guard.ts
+import { Injectable } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+
+@Injectable()
+export class JwtAuthGuard extends AuthGuard('jwt') {}
+
+📝 Resultado Final
+Visita http://localhost:3000/api
+
+Haz login con POST /auth/login
+
+Copia el access_token
+
+Haz clic en “Authorize” (en Swagger) y pégalo como: Bearer <token>
+
+Ahora puedes acceder a las rutas protegidas
+
+---------------------------------
+Perfecto! A continuación te dejo todo lo que necesitas para:
+
+✅ Crear un archivo .env con la configuración de JWT y base de datos
+
+✅ Insertar un usuario de prueba en tu tabla users, con contraseña encriptada usando bcrypt
+
+✅ Cargar ese usuario desde el backend NestJS para el login
+
+📁 1. Archivo .env
+Crea un archivo .env en la raíz del proyecto:
+
+DB_HOST=localhost
+DB_PORT=1433
+DB_USERNAME=sa
+DB_PASSWORD=TuPasswordSegura
+DB_DATABASE=NombreDeTuBaseDeDatos
+
+JWT_SECRET=clave_super_secreta
+JWT_EXPIRES_IN=3600s
+
+📄 2. Configurar conexión a la base de datos con .env
+En app.module.ts o donde tengas TypeOrmModule.forRoot():
+
+import { ConfigModule } from '@nestjs/config';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }), // Cargar variables .env
+    TypeOrmModule.forRoot({
+      type: 'mssql',
+      host: process.env.DB_HOST,
+      port: parseInt(process.env.DB_PORT, 10),
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
+      synchronize: false,
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      options: { encrypt: false },
+    }),
+    // ...
+  ],
+})
+
+🔐 3. Configurar JwtModule con .env
+En auth.module.ts:
+JwtModule.register({
+  secret: process.env.JWT_SECRET,
+  signOptions: { expiresIn: process.env.JWT_EXPIRES_IN },
+}),
+
+🧾 4. Crear tabla users (si no existe)
+CREATE TABLE users (
+  id INT IDENTITY(1,1) PRIMARY KEY,
+  username VARCHAR(50) NOT NULL UNIQUE,
+  password VARCHAR(100) NOT NULL
+);
+
+🔒 5. Crear usuario con contraseña encriptada (bcrypt)
+Opción 1: Insertar directamente con bcrypt desde Node.js
+Crea un script seed-user.ts para insertar el usuario:
+
+import * as bcrypt from 'bcrypt';
+import { createConnection } from 'typeorm';
+import { User } from './src/users/user.entity';
+
+async function seed() {
+  const connection = await createConnection({
+    type: 'mssql',
+    host: 'localhost',
+    port: 1433,
+    username: 'sa',
+    password: 'TuPasswordSegura',
+    database: 'NombreDeTuBaseDeDatos',
+    entities: [User],
+    synchronize: false,
+    options: { encrypt: false },
+  });
+
+  const userRepo = connection.getRepository(User);
+
+  const hashedPassword = await bcrypt.hash('admin123', 10);
+
+  const user = userRepo.create({
+    username: 'admin',
+    password: hashedPassword,
+  });
+
+  await userRepo.save(user);
+  console.log('Usuario admin creado');
+
+  await connection.close();
+}
+
+seed();
+
+Y luego ejecútalo:
+
+ts-node seed-user.ts
+
+🚀 Resultado final
+Usuario creado:
+
+username: admin
+
+password: admin123
+
+Puedes hacer POST /auth/login con esos datos y obtener un JWT válido
+

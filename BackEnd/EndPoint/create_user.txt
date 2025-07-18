@@ -1,0 +1,9 @@
+url: http://localhost:3000/api/user/
+método: post
+boby:
+{
+    "username": "juanchi",
+    "password": "juanchi123",
+    "createdAt": "2025/07/05",
+    "authStrategy": "google.com"
+}

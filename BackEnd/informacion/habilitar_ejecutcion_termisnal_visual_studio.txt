@@ -1,0 +1,3 @@
+Ejecuta este comando en PowerShell como administrador para permitir scripts solo durante esta sesión:
+
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass

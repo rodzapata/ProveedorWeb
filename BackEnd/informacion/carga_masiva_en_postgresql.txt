@@ -1,0 +1,8 @@
+COPY mi_tabla
+FROM 'C:/ruta/archivo.csv'
+WITH (
+    FORMAT csv,
+    HEADER true,
+    DELIMITER ',',
+    ENCODING 'UTF8'
+);

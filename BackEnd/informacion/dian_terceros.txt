@@ -1,0 +1,19 @@
+Necesito crear un End point en NestJS con la siguiente estructura,
+debe terner las mejores practicas usando capas y DTO la base de datos
+es sqlserver
+
+[
+	{
+	"nit_dian": "72209311",
+	"apellido1": "rodney",
+	"apellido2": "zapata",
+	"tipo_doc" :"13",
+	"direccion" : "kra 5B No. 56C-23",
+	"codDpto" : "",
+	"codMunicipio" : "",
+
+	}
+]
+
+insert dian_terceros(nit_dian,apellido1,apellido2,tipo_doc, direccion,codDpto, CodMunicipio)
+values('72209311','zapata','palacio','13','Kra 5B no. 56c-93','17','001')

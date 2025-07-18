@@ -1,0 +1,59 @@
+tasklist | find /i "sqlservr.exe"
+el servicio tiene el numero 23000
+
+netstat -oan | find /i "23000"
+y nos muestra los puertos en la empresa es el 61061
+en la casa es 49789
+
+para cambiar el puerto de sqlserver hay que entra a panel de control
+Herramientas del Sistemas --- Administración de Equipo
+Debajo de Administración de Disco hay uno que se llama 
+Servicios y aplicaciones
+después se escoge SQL Server Configuration Manager
+y se escoge la opción SQL server network configuración
+se abre una ventana con 2 pestañas (protocolo , IP adresss)
+hay escoger la de IP apress y buscar al final la que dice IPAII
+TCP Dynamics Port: 51537 colocamos el puerto que queremos
+
+
+
+---
+tutorial de spring boot
+https://www.youtube.com/watch?v=OXdPA2tyNXE
+
+----para converir clase a json en java
+https://jsonformatter.org/
+
+https://www.sysadmit.com/2016/03/mssql-ver-puerto-de-una-instancia.html
+----------------------------------------application.yml----------
+spring:
+  datasource:
+    url: jdbc:sqlserver://localhost:61061;encrypt=false;trustServerCertificate=true;databaseName=servi_ot
+    username: sa
+    password: Clave01.
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database-platform: org.hibernate.dialect.SQLServerDialect
+
+
+-----------------------------------
+{
+    "fullName":"rodney zapata",
+    "bornDate":"1975/02/26",
+    "color":"azul",
+    "email":"rodneyzapatapalacio@gmail.com",
+    "phone":"3103724590",
+    "avatar":"foto1.jpg",
+    "password":"Clave01",
+    "rolId":"1"
+}
+----------------------
+Msg 9002, Level 17, State 4, Procedure _listado_provision_nuevo, Line 71 [Batch Start Line 0]
+El registro de transacciones de la base de datos 'tempdb' está lleno debido a 'ACTIVE_TRANSACTION'. 
+----
+uso del mappercon mapstruct
+https://www.youtube.com/watch?v=nMIdoGcE5XE&ab_channel=CryptoGramming

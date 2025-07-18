@@ -1,0 +1,19 @@
+import psycopg2
+
+conn = psycopg2.connect(
+    dbname='tu_basedatos',
+    user='tu_usuario',
+    password='tu_contraseña',
+    host='localhost',
+    port='5432'
+)
+
+cursor = conn.cursor()
+
+with open('ruta/archivo.csv', 'r', encoding='utf-8') as f:
+    next(f)  # Saltar encabezado si existe
+    cursor.copy_expert("COPY mi_tabla FROM STDIN WITH CSV", f)
+
+conn.commit()
+cursor.close()
+conn.close()

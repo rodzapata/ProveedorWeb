@@ -1,0 +1,18 @@
+import java.sql.*;
+import java.io.*;
+
+public class BulkInsert {
+    public static void main(String[] args) throws Exception {
+        Connection conn = DriverManager.getConnection(
+            "jdbc:postgresql://localhost:5432/tu_basedatos", "usuario", "contraseña");
+
+        String sql = "COPY mi_tabla FROM STDIN WITH (FORMAT csv, HEADER true)";
+        FileReader fileReader = new FileReader("C:/ruta/archivo.csv");
+        PGConnection pgconn = conn.unwrap(org.postgresql.PGConnection.class);
+
+        CopyManager copyManager = pgconn.getCopyAPI();
+        copyManager.copyIn(sql, fileReader);
+
+        conn.close();
+    }
+}

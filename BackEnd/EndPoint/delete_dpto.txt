@@ -1,0 +1,8 @@
+url: http://localhost:3000/api/dpto/36
+método: DELETE
+boby:
+
+{
+        "codDpto": "98",
+        "nombreDpto": "Prueba modificado"
+}
