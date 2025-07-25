@@ -1,0 +1,43 @@
+1043202407
+✅ Pasos para compartir internet de Android a PC por USB
+1. Conecta el celular al PC
+Usa un cable USB funcional (preferiblemente original o de buena calidad).
+
+2. Activa la conexión de datos móviles en tu celular
+Asegúrate de que tienes acceso a internet desde el celular (por 3G, 4G o 5G).
+
+3. Ve a la configuración de anclaje USB
+En tu celular Android:
+
+Abre Configuración (Ajustes).
+
+Ve a Redes e Internet o Conexiones (el nombre puede variar).
+
+Toca en Zona Wi-Fi/Compartir conexión o Anclaje de red y zona portátil.
+
+Activa la opción "Anclaje de USB" o "Compartir por USB".
+
+⚠️ Esta opción solo aparece cuando el celular está conectado por cable USB al PC.
+
+4. Windows debería reconocer la conexión automáticamente
+Se creará una nueva red en el PC, como si fuera una red Ethernet.
+
+Ya deberías tener acceso a internet en tu PC a través del celular.
+
+🛠️ Si no funciona:
+Revisa los drivers: Windows debería instalar automáticamente los drivers del celular. Si no, puedes:
+
+Ir al Administrador de dispositivos en Windows.
+
+Ver si aparece un error en “Dispositivos portátiles” o “Redes”.
+
+Hacer clic derecho y elegir Actualizar controlador.
+
+Activa la depuración USB (opcional):
+
+Ve a Configuración > Acerca del teléfono > Número de compilación y toca 7 veces para activar las Opciones de desarrollador.
+
+Luego ve a Opciones de desarrollador y activa Depuración USB.
+
+Desactiva el Modo solo carga: cuando conectes el teléfono, selecciona "Transferencia de archivos" o "Transferir fotos (PTP)" en lugar de solo carga.
+

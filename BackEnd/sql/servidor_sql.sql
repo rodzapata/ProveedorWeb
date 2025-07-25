@@ -1,3 +1,6 @@
+--ver puertos de sql
+xp_readerrorlog 0, 1, N'Server is listening on' 
+
 EXEC sp_addlinkedserver
 @server='SQLEXPRESS2005', /* local SQL name given to the linked server */
 @srvproduct='NULL', /* not used */
